@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Qnik AI</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #0b0d12;
+      color: white;
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 900px;
+      margin: auto;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    header {
+      height: 70px;
+      padding: 0 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #242733;
+      background: #10131a;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg,#7c3aed,#2563eb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .brand h1 {
+      font-size: 21px;
+    }
+
+    .brand span {
+      display: block;
+      color: #8b93a7;
+      font-size: 11px;
+      margin-top: 2px;
+    }
+
+    .premium-btn {
+      border: 0;
+      border-radius: 20px;
+      padding: 10px 15px;
+      color: white;
+      background: linear-gradient(135deg,#7c3aed,#2563eb);
+      font-weight: bold;
+    }
+
+    /* CHAT */
+    #chat {
+      flex: 1;
+      padding: 25px 18px 120px;
+    }
+
+    .welcome {
+      text-align: center;
+      padding: 65px 15px 35px;
+    }
+
+    .welcome-logo {
+      width: 70px;
+      height: 70px;
+      margin: auto;
+      border-radius: 24px;
+      background: linear-gradient(135deg,#7c3aed,#2563eb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      font-weight: bold;
+      box-shadow: 0 0 45px rgba(91,80,220,.3);
+    }
+
+    .welcome h2 {
+      margin-top: 20px;
+      font-size: 30px;
+    }
+
+    .welcome p {
+      color: #9299aa;
+      margin-top: 9px;
+    }
+
+    .suggestions {
+      display: grid;
+      grid-template-columns: repeat(2,1fr);
+      gap: 12px;
+      max-width: 600px;
+      margin: 25px auto;
+    }
+
+    .suggestion {
+      background: #141720;
+      border: 1px solid #282d3b;
+      border-radius: 15px;
+      padding: 16px;
+      text-align: left;
+      color: #dce0e9;
+      cursor: pointer;
+    }
+
+    .suggestion:hover {
+      border-color: #6655e8;
+    }
+
+    .suggestion small {
+      display: block;
+      color: #777f92;
+      margin-top: 6px;
+    }
+
+    /* MESSAGES */
+    .message {
+      display: flex;
+      margin: 18px 0;
+      gap: 10px;
+    }
+
+    .message.user {
+      justify-content: flex-end;
+    }
+
+    .bubble {
+      max-width: 80%;
+      padding: 14px 16px;
+      border-radius: 18px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .user .bubble {
+      background: linear-gradient(135deg,#5b43d6,#315fd1);
+    }
+
+    .assistant .bubble {
+      background: #151922;
+      border: 1px solid #282d39;
+    }
+
+    /* INPUT */
+    .input-area {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent,#0b0d12 25%);
+      padding: 25px 15px 18px;
+    }
+
+    .input-box {
+      max-width: 850px;
+      margin: auto;
+      background: #151922;
+      border: 1px solid #303544;
+      border-radius: 20px;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    #prompt {
+      flex: 1;
+      background: transparent;
+      border: 0;
+      outline: 0;
+      color: white;
+      font-size: 15px;
+      padding: 12px;
+    }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      border: 0;
+      border-radius: 13px;
+      background: #222735;
+      color: white;
+      cursor: pointer;
+      font-size: 17px;
+    }
+
+    .send {
+      background: linear-gradient(135deg,#7c3aed,#2563eb);
+    }
+
+    .footer-text {
+      text-align: center;
+      color: #5f6676;
+      font-size: 10px;
+      margin-top: 8px;
+    }
+
+    /* PREMIUM */
+    .premium-card {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.75);
+      z-index: 50;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .premium-inner {
+      max-width: 430px;
+      width: 100%;
+      background: #151922;
+      border: 1px solid #343949;
+      border-radius: 25px;
+      padding: 25px;
+    }
+
+    .premium-inner h2 {
+      font-size: 26px;
+      margin-bottom: 8px;
+    }
+
+    .premium-inner p {
+      color: #969eaf;
+      margin-bottom: 20px;
+    }
+
+    .plan {
+      border: 1px solid #303646;
+      border-radius: 17px;
+      padding: 18px;
+      margin: 12px 0;
+      cursor: pointer;
+    }
+
+    .plan:hover {
+      border-color: #7258ed;
+    }
+
+    .price {
+      font-size: 25px;
+      font-weight: bold;
+    }
+
+    .close {
+      width: 100%;
+      padding: 13px;
+      margin-top: 10px;
+      border: 0;
+      border-radius: 14px;
+      background: #292e3a;
+      color: white;
+    }
+
+    @media(max-width:600px) {
+      .suggestions {
+        grid-template-columns: 1fr;
+      }
+
+      .welcome h2 {
+        font-size: 25px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <header>
+    <div class="brand">
+      <div class="logo">Q</div>
+      <div>
+        <h1>Qnik AI</h1>
+        <span>Your AI assistant</span>
+      </div>
+    </div>
+
+    <button class="premium-btn" onclick="openPremium()">
+      ✦ Premium
+    </button>
+  </header>
+
+  <main id="chat">
+
+    <section class="welcome" id="welcome">
+      <div class="welcome-logo">Q</div>
+
+      <h2>What can I help with?</h2>
+
+      <p>Ask Qnik AI anything.</p>
+
+      <div class="suggestions">
+
+        <div class="suggestion"
+             onclick="useSuggestion('Explain something to me')">
+          💡 Learn something
+          <small>Get a simple explanation</small>
+        </div>
+
+        <div class="suggestion"
+             onclick="useSuggestion('Write a professional message for me')">
+          ✍️ Write for me
+          <small>Create messages and content</small>
+        </div>
+
+        <div class="suggestion"
+             onclick="useSuggestion('Give me some business ideas')">
+          💼 Business
+          <small>Ideas and planning</small>
+        </div>
+
+        <div class="suggestion"
+             onclick="useSuggestion('Help me learn coding')">
+          💻 Coding
+          <small>Learn and build projects</small>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+</div>
+
+<div class="input-area">
+
+  <div class="input-box">
+
+    <button class="icon-btn" title="Upload">
+      ＋
+    </button>
+
+    <input
+      id="prompt"
+      type="text"
+      placeholder="Message Qnik AI..."
+      onkeydown="handleKey(event)"
+    >
+
+    <button class="icon-btn" title="Voice">
+      🎙
+    </button>
+
+    <button class="icon-btn send" onclick="sendMessage()">
+      ➤
+    </button>
+
+  </div>
+
+  <div class="footer-text">
+    Qnik AI can make mistakes. Check important information.
+  </div>
+
+</div>
+
+<!-- PREMIUM POPUP -->
+
+<div class="premium-card" id="premium">
+
+  <div class="premium-inner">
+
+    <h2>✦ Upgrade to Qnik Premium</h2>
+
+    <p>
+      Unlock more AI features and higher usage limits.
+    </p>
+
+    <div class="plan">
+      <strong>Monthly</strong>
+      <div class="price">₹75 <small>/ month</small></div>
+    </div>
+
+    <div class="plan">
+      <strong>Yearly</strong>
+      <div class="price">₹299 <small>/ year</small></div>
+    </div>
+
+    <button class="close" onclick="closePremium()">
+      Close
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+
+function useSuggestion(text) {
+  document.getElementById("prompt").value = text;
+  document.getElementById("prompt").focus();
+}
+
+function handleKey(event) {
+  if (event.key === "Enter") {
+    sendMessage();
+  }
+}
+
+function sendMessage() {
+
+  const input = document.getElementById("prompt");
+  const text = input.value.trim();
+
+  if (!text) return;
+
+  const chat = document.getElementById("chat");
+  const welcome = document.getElementById("welcome");
+
+  if (welcome) {
+    welcome.remove();
+  }
+
+  const userMessage = document.createElement("div");
+  userMessage.className = "message user";
+
+  userMessage.innerHTML =
+    '<div class="bubble"></div>';
+
+  userMessage.querySelector(".bubble").textContent = text;
+
+  chat.appendChild(userMessage);
+
+  input.value = "";
+
+  setTimeout(() => {
+
+    const aiMessage = document.createElement("div");
+    aiMessage.className = "message assistant";
+
+    aiMessage.innerHTML =
+      '<div class="bubble">👋 Hi! I am Qnik AI.<br><br>' +
+      'Your AI backend is not connected yet. ' +
+      'Once we connect the secure AI backend, I will be able to answer your questions here.</div>';
+
+    chat.appendChild(aiMessage);
+
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: "smooth"
+    });
+
+  }, 500);
+}
+
+function openPremium() {
+  document.getElementById("premium").style.display = "flex";
+}
+
+function closePremium() {
+  document.getElementById("premium").style.display = "none";
+}
+
+</script>
+
+</body>
+</html>
